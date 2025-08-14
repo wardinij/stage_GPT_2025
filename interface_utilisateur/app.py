@@ -31,7 +31,7 @@ def set_background(image_file):
         unsafe_allow_html=True
     )
 
-set_background("interface_utilisateur/background.jpg")  # remplace par ton fichier image
+set_background("interface_utilisateur/wallpaper.jpg")  # remplace par ton fichier image
 
 # Load model
 model = SentenceTransformer("all-MiniLM-L6-v2", device='cpu')
@@ -87,7 +87,8 @@ def search_description(query, k=5):
     return [{"code": codes[i], "description": descriptions[i]} for i in indices[0]]
 
 # Streamlit UI
-st.title("🔍 Recherche de Code HS")
+st.title("Recherche de Code HS")
+
 st.markdown("Entrez une **description** ou un **nom de produit** pour obtenir des codes HS similaires.")
 
 mode = st.radio("Choisissez un mode :", ["Entrer une description", "Entrer un nom de produit"])
@@ -95,13 +96,13 @@ mode = st.radio("Choisissez un mode :", ["Entrer une description", "Entrer un no
 query = ""
 
 if mode == "Entrer une description":
-    query = st.text_input("✍️ Description générale du produit")
+    query = st.text_input("Description générale du produit")
 elif mode == "Entrer un nom de produit":
     product_name = st.text_input("📦 Nom du produit (ex : iPhone 15)")
 
 if st.button("Rechercher des codes HS"):
     if mode == "Entrer un nom de produit" and product_name:
-        with st.spinner("🧠 Génération de la description via Ollama..."):
+        with st.spinner("Génération de la description via Ollama..."):
             query = get_product_description_clean(product_name)
         if query:
             st.success(f"✅ Description générée : {query}")
@@ -115,11 +116,12 @@ if st.button("Rechercher des codes HS"):
     with st.spinner("🔍 Recherche FAISS en cours..."):
         results = search_description(query)
 
+    # Remplacement de votre boucle de résultats
     if results:
+        st.markdown("---")
         st.markdown("### Résultats possibles")
         for r in results:
-            st.markdown(f"**Code HS** : `{r['code']}`")
-            st.markdown(f"**Description** : {r['description']}")
-            st.markdown("---")
+            with st.expander(f"**Code HS :** `{r['code']}`"):
+                st.write(f"**Description :** {r['description']}")
     else:
         st.warning("Aucun résultat trouvé.")
